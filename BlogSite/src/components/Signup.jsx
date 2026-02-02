@@ -10,7 +10,14 @@ function Signup() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const dispatch = useDispatch();
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm( {
+      mode : "onBlur",
+      } );
 
   const create = async (data) => {
     try {
@@ -55,18 +62,49 @@ function Signup() {
               placeholder="Enter your full name"
               {...register("fullName", { required: true })}
             />
+            {errors.fullName && (
+              <p className="text-red-600 text-lg">Name is complusory feild</p>
+            )}
             <Input
               label="Email"
               placeholder="Enter email"
               type="email"
-              {...register("email", { required: true })}
+              {...register("email", {
+                required: true,
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Enter a valid email",
+                },
+              })}
             />
+            {errors.email && (
+              <p className="text-red-600 text-lg">E-Mail is complusory feild</p>
+            )}
             <Input
               label="Password"
               placeholder="Enter password"
               type="password"
               {...register("password", { required: true })}
             />
+            {errors.password && (
+              <p className="text-red-600 text-lg">
+                Password is complusory feild
+              </p>
+            )}
+            <Input 
+              label="confirmPassword"
+              placeholder="Confirm Password"
+              type="password"
+              {...register("confirmPassword",{ 
+                required:true,
+                validate:(value)=>{
+                  return value === getValues("password") || "Password do not match"
+                }
+              })}
+              />
+              {errors.confirmPassword && (
+                <p className="text-red-600 text-lg">{errors.confirmPassword.message}</p>
+              )}
             <Button type="submit" className="w-full">
               Create Account
             </Button>

@@ -136,14 +136,39 @@ import postService from "../../services/postServices.js";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-const PostForm = () => {
+const PostForm = ({ post }) => {
   const { register, handleSubmit, control } = useForm();
   const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.userData);
 
-  const submit = async (data) => {
-    let featuredImage = null;
+ const submit = async (data) => {
+  if (post) {
+    // ✏️ UPDATE POST
+    const updatedPost = await postService.updatePost(post.id, {
+      ...data,
+      featuredImage: post.featuredImage,
+    });
 
+    if (updatedPost) {
+      navigate(`/post/${post.id}`);
+    }
+  } else {
+    // ➕ CREATE POST
+    const reader = new FileReader();
+    reader.readAsDataURL(data.image[0]);
+
+    reader.onload = async () => {
+      const dbPost = await postService.createPost({
+        ...data,
+        featuredImage: reader.result,
+        userId: userData.id,
+      });
+
+      if (dbPost) {
+        navigate(`/post/${dbPost.id}`);
+      }
+    }
+  }
     // convert image to base64
     if (data.image && data.image[0]) {
       const file = data.image[0];

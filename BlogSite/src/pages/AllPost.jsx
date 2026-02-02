@@ -5,22 +5,24 @@ import postService from "../services/postServices";
 function AllPost() {
   const [posts, setPosts] = useState([]);
 
-  useEffect(() => {}, []);
-
-  postService.getPosts([]).then((posts) => {
-    if (posts) {
-      setPosts(posts.documents);
+  useEffect(() => {
+    postService.getPosts().then((posts) => {
       console.log("posts: ", posts);
-    }
-  });
+      if (posts) {
+        setPosts(posts);
+      }
+    });
+
+  }, []);
+
 
   return (
     <div className="w-full py-8">
       <Container>
         <div className="flex flex-wrap">
-          {false && posts.map((post) => (
+          {posts.map((post) => (
               <div key={post.$id} className="p-2 w-1/4">
-                <PostCard post={post} />
+                <PostCard {...post} />
               </div>
             ))}
         </div>
